@@ -1,0 +1,385 @@
+ :root {
+    --bg-color: #F0F4F8;
+    --btn-green: #12D11E;
+    --btn-green-dark: #0fb319;
+    --btn-blue: #2196F3;
+    --btn-blue-dark: #1976D2;
+    --btn-orange: #FF9800;
+    --btn-orange-dark: #F57C00;
+    --correct-bg: #E8F5E9;
+    --correct-border: #2E7D32;
+    --wrong-bg: #FFEBEE;
+    --wrong-border: #C62828;
+    --progress-yellow: #FFC107;
+    --grey-border: #B0BEC5;
+}
+* {
+    box-sizing: border-box;
+    font-family: 'Almarai', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+body {
+    margin: 0;
+    background-color: var(--bg-color);
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+#app-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+}
+.screen.active {
+    display: flex;
+}
+#home-screen {
+    justify-content: center;
+}
+#section-select-screen {
+    justify-content: flex-start;
+    padding-top: 10px;
+}
+.btn-main {
+    width: 90%;
+    max-width: 400px;
+    background-color: var(--btn-green);
+    color: white;
+    padding: 25px;
+    margin: 15px 0;
+    border-radius: 25px;
+    border: none;
+    font-size: 32px;
+    font-weight: 800;
+    box-shadow: 0 8px 0 var(--btn-green-dark);
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+.btn-main:active {
+    transform: translateY(8px);
+    box-shadow: 0 0px 0 transparent !important;
+}
+.btn-sec {
+    width: 90%;
+    max-width: 400px;
+    background-color: var(--btn-blue);
+    color: white;
+    padding: 15px;
+    margin: 8px 0;
+    border-radius: 15px;
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    box-shadow: 0 6px 0 var(--btn-blue-dark);
+    cursor: pointer;
+    transition: all 0.1s;
+}
+.btn-sec.all {
+    background-color: var(--btn-orange);
+    box-shadow: 0 6px 0 var(--btn-orange-dark);
+    margin-top: 20px;
+    padding: 20px;
+    font-size: 24px;
+}
+.btn-sec:active {
+    transform: translateY(6px);
+    box-shadow: 0 0px 0 transparent !important;
+}
+.rev-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 40px;
+    position: sticky;
+    top: 0;
+    background: var(--bg-color);
+    padding: 15px 0;
+    z-index: 10;
+    border-bottom: 2px solid #ccc;
+}
+.mindmap-board {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 45px;
+    padding-bottom: 40px;
+}
+.mindmap-node {
+    background: #fff;
+    border-radius: 25px;
+    padding: 20px;
+    box-shadow: 0 8px 0 var(--grey-border);
+    border: 3px solid var(--grey-border);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.mindmap-title {
+    background: #2196F3;
+    color: white;
+    font-size: 24px;
+    font-weight: 800;
+    padding: 10px 30px;
+    border-radius: 20px;
+    text-align: center;
+    margin-top: -45px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 0 #1976D2;
+    direction: ltr;
+}
+.branch-grid {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+}
+.branch {
+    border-radius: 15px;
+    padding: 15px;
+    direction: ltr;
+    text-align: left;
+}
+.branch .node-title {
+    font-weight: 800;
+    font-size: 18px;
+    margin-bottom: 8px;
+    direction: ltr;
+    text-align: left;
+}
+.branch .node-content {
+    font-size: 17px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.6;
+    direction: ltr;
+    text-align: left;
+}
+.ltr {
+    direction: ltr;
+    display: inline-block;
+}
+.branch.origin {
+    background: #E3F2FD;
+    border-right: 8px solid #2196F3;
+}
+.branch.key {
+    background: #FFF3E0;
+    border-right: 8px solid #FF9800;
+}
+.branch.other {
+    background: #F5F5F5;
+    border-right: 8px solid #9E9E9E;
+}
+.branch.chem {
+    background: #FCE4EC;
+    border-right: 8px solid #E91E63;
+}
+.quiz-header {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.progress-bar-bg {
+    flex-grow: 1;
+    height: 18px;
+    background: #E0E0E0;
+    border-radius: 10px;
+    margin: 0 15px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+.progress-bar-fill {
+    height: 100%;
+    background: var(--progress-yellow);
+    width: 0%;
+    transition: width 0.4s ease;
+}
+.close-btn {
+    color: #D32F2F;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 10px;
+}
+#round-info {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #1976D2;
+    font-weight: 800;
+    font-size: 20px;
+}
+.question-box {
+    width: 100%;
+    max-width: 800px;
+    padding: 10px 15px;
+    text-align: left;
+    direction: ltr;
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: #000;
+    font-weight: 800;
+    line-height: 1.4;
+}
+.options-container {
+    width: 100%;
+    max-width: 800px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding-bottom: 100px;
+}
+@media (min-width: 600px) {
+    .options-container {
+    grid-template-columns: 1fr 1fr;
+}
+} .option-btn {
+    border: 3px solid var(--grey-border);
+    border-radius: 20px;
+    padding: 18px 20px;
+    text-align: left;
+    direction: ltr;
+    font-size: 18px;
+    font-weight: 800;
+    color: #000;
+    background: white;
+    box-shadow: 0 6px 0 var(--grey-border);
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+}
+.option-btn.active-click:active {
+    transform: translateY(6px);
+    box-shadow: 0 0px 0 transparent;
+}
+.option-btn.correct {
+    background: var(--correct-bg) !important;
+    border-color: var(--correct-border) !important;
+    color: var(--correct-border) !important;
+    box-shadow: 0 6px 0 var(--correct-border);
+    pointer-events: none;
+}
+.option-btn.wrong {
+    background: var(--wrong-bg) !important;
+    border-color: var(--wrong-border) !important;
+    color: var(--wrong-border) !important;
+    box-shadow: 0 6px 0 var(--wrong-border);
+    pointer-events: none;
+}
+.option-btn.locked {
+    pointer-events: none;
+}
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 20px;
+    background: white;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    z-index: 100;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+}
+.nav-btn {
+    flex: 1;
+    max-width: 390px;
+    color: white;
+    padding: 18px;
+    border-radius: 20px;
+    border: none;
+    font-size: 24px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+.nav-btn.next {
+    background: var(--btn-green);
+    box-shadow: 0 6px 0 var(--btn-green-dark);
+}
+.nav-btn.prev {
+    background: var(--btn-blue);
+    box-shadow: 0 6px 0 var(--btn-blue-dark);
+}
+.nav-btn:active:not(:disabled) {
+    transform: translateY(6px);
+    box-shadow: 0 0px 0 transparent;
+}
+.nav-btn:disabled {
+    background: #B0BEC5;
+    box-shadow: 0 6px 0 #90A4AE;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    z-index: 200;
+    justify-content: center;
+    align-items: center;
+}
+.dialog {
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    border-radius: 30px;
+    padding: 40px 20px;
+    text-align: center;
+    animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes pop {
+    from {
+    transform: scale(0.7);
+    opacity: 0;
+}
+to {
+    transform: scale(1);
+    opacity: 1;
+}
+} 
+/* ستايل إضافي لضبط الصور داخل الأسئلة والمراجعة*/
+    .plant-img {
+    max-width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.q-img {
+    max-width: 100%;
+    height: auto;
+    max-height: 250px;
+    border-radius: 8px;
+    margin-top: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+} 

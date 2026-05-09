@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pharmacognosy Morphology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <script src="revisionData.js"></script>
+    <script src="questionsBank.js"></script>
+
+   <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="app-container">
+
+        <div id="home-screen" class="screen active">
+            <h1 style="color:#4CAF50; font-size: 36px; margin-bottom: 40px; text-align: center;">Pharmacognosy<br>Morphology</h1>
+            <button class="btn-main" onclick="openRevision()">المراجعة السريعة</button>
+            <button class="btn-main" onclick="openSectionSelect()">أسئلة الـ MCQ</button>
+        </div>
+
+        <div id="section-select-screen" class="screen">
+            <div class="rev-header">
+                <h2 style="margin:0; color:#4CAF50; font-size: 26px;">اختر نوع الأسئلة</h2>
+                <span class="close-btn" onclick="goHome()">✕</span>
+            </div>
+            
+            <button class="btn-sec" onclick="initQuiz('part1')">القسم الأول: التعرف على النبات من الصورة</button>
+            <button class="btn-sec" onclick="initQuiz('part2')">القسم الثاني: الاسم بالكامل (Origins)</button>
+            
+            <button class="btn-sec all" onclick="initQuiz('all')">امتحان شامل (القسمين معاً)</button>
+        </div>
+
+        <div id="revision-screen" class="screen">
+            <div class="rev-header">
+                <h2 style="margin:0; color:#4CAF50; font-size: 26px;">المراجعة (Plants Origin)</h2>
+                <span class="close-btn" onclick="goHome()">✕</span>
+            </div>
+            <div class="mindmap-board" id="mindmap-container"></div>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <span class="close-btn" onclick="goHome()">✕</span>
+                <div class="progress-bar-bg">
+                    <div id="bar" class="progress-bar-fill" style="background-color: #4CAF50;"></div>
+                </div>
+                <div id="counter" style="font-weight: 800; min-width: 60px; font-size: 18px; direction: ltr; text-align: center;">0/0</div>
+            </div>
+
+            <div id="round-info">الجولة (1)</div>
+            <div class="question-box"><div id="q-txt" style="text-align: left; direction: ltr;">...</div></div>
+            <div class="options-container" id="opt-box" style="direction: ltr; text-align: left;"></div>
+
+            <div class="footer">
+                <button id="prev-btn" class="nav-btn prev" onclick="goPrev()">السابق</button>
+                <button id="next-btn" class="nav-btn next" onclick="goNext()">التالي</button>
+            </div>
+        </div>
+
+        <div id="win-overlay" class="overlay">
+            <div class="dialog">
+                <h1 style="color: var(--btn-green); font-size: 45px; margin: 0 0 15px 0;">بطل! 🎉</h1>
+                <p style="font-size: 22px; font-weight: 800; color: #333; margin-bottom: 30px;">لقد أنهيت جميع الأسئلة بنجاح تام.</p>
+                <button class="btn-main" style="width: 100%; box-shadow: 0 6px 0 var(--btn-green-dark);" onclick="location.reload()">العودة للرئيسية</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentRoundQuestions = [];
+        let currentIndex = 0;
+        let currentRound = 1;
+
+        window.onload = () => { 
+            if(typeof revisionData !== 'undefined') {
+                renderRevision(); 
+            } else {
+                console.error("لم يتم العثور على ملف revisionData.js");
+            }
+        };
+
+        function renderRevision() {
+            const container = document.getElementById('mindmap-container');
+            container.innerHTML = '';
+            revisionData.forEach(section => {
+                let branchesHTML = '';
+                section.branches.forEach(branch => {
+                    branchesHTML += `
+                        <div class="branch ${branch.colorClass}" style="text-align:center;">
+                            <div class="node-title" style="color:${branch.titleColor}; font-size: 20px;">${branch.title}</div>
+                            <div class="node-content" style="direction: ltr;">${branch.content}</div>
+                        </div>`;
+                });
+                container.innerHTML += `
+                    <div class="mindmap-node">
+                        <div class="mindmap-title" style="background-color:#4CAF50;">${section.sectionTitle}</div>
+                        <div class="branch-grid">${branchesHTML}</div>
+                    </div>`;
+            });
+        }
+
+        function goHome() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('home-screen').classList.add('active');
+        }
+
+        function openRevision() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('revision-screen').classList.add('active');
+        }
+
+        function openSectionSelect() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-select-screen').classList.add('active');
+        }
+
+        function initQuiz(sectionId) {
+            if(typeof questionsBank === 'undefined') {
+                alert("لم يتم العثور على ملف questionsBank.js");
+                return;
+            }
+
+            let filteredQuestions = [];
+            if (sectionId === 'all') {
+                filteredQuestions = [...questionsBank];
+            } else {
+                filteredQuestions = questionsBank.filter(q => q.section === sectionId);
+            }
+
+            if (filteredQuestions.length === 0) {
+                alert("عذراً، لا توجد أسئلة لهذا القسم حالياً!");
+                return;
+            }
+
+            prepareRound(filteredQuestions);
+            currentRound = 1;
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('quiz-screen').classList.add('active');
+
+            loadQuestion();
+        }
+
+        function prepareRound(questionsArray) {
+            currentRoundQuestions = questionsArray.map(q => {
+                let newQ = JSON.parse(JSON.stringify(q));
+                if (newQ.opts.length > 2) {
+                    newQ.shuffledIndices = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+                } else {
+                    newQ.shuffledIndices = [0, 1];
+                }
+                newQ.userAnswerIndex = null;
+                return newQ;
+            });
+            currentRoundQuestions.sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+        }
+
+        function updateProgressUI() {
+            let total = currentRoundQuestions.length;
+            let currentNum = currentIndex + 1;
+            document.getElementById('counter').innerText = `${currentNum} / ${total}`;
+            document.getElementById('bar').style.width = `${(currentNum / total) * 100}%`;
+            document.getElementById('round-info').innerText = `الجولة (${currentRound})`;
+        }
+
+        function loadQuestion() {
+            updateProgressUI();
+            const qData = currentRoundQuestions[currentIndex];
+            document.getElementById('q-txt').innerHTML = `<span style="color:#4CAF50; font-weight:bold;">Q${currentIndex + 1}:</span> ${qData.q}`;
+
+            const box = document.getElementById('opt-box');
+            box.innerHTML = '';
+            let validIndices = qData.shuffledIndices.filter(idx => qData.opts[idx] !== undefined);
+
+            validIndices.forEach(originalIdx => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.innerHTML = qData.opts[originalIdx];
+
+                if (qData.userAnswerIndex === null) {
+                    btn.classList.add('active-click');
+                    btn.onclick = () => selectOption(btn, originalIdx, qData);
+                } else {
+                    btn.classList.add('locked');
+                    if (originalIdx === qData.correct) {
+                        btn.classList.add('correct');
+                    } else if (originalIdx === qData.userAnswerIndex) {
+                        btn.classList.add('wrong');
+                    }
+                }
+                box.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = (currentIndex === 0);
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = (qData.userAnswerIndex === null);
+            nextBtn.innerText = (currentIndex === currentRoundQuestions.length - 1 && qData.userAnswerIndex !== null) ? "إنهاء الجولة" : "التالي";
+        }
+
+        function selectOption(selectedBtn, originalIdx, qData) {
+            qData.userAnswerIndex = originalIdx;
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(btn => {
+                btn.classList.remove('active-click');
+                btn.classList.add('locked');
+                btn.onclick = null;
+            });
+
+            let idxCounter = 0;
+            let validIndices = qData.shuffledIndices.filter(idx => qData.opts[idx] !== undefined);
+            validIndices.forEach(idx => {
+                if (idx === qData.correct) {
+                    allBtns[idxCounter].classList.add('correct');
+                } else if (idx === qData.userAnswerIndex) {
+                    allBtns[idxCounter].classList.add('wrong');
+                }
+                idxCounter++;
+            });
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = false;
+            if (currentIndex === currentRoundQuestions.length - 1) {
+                nextBtn.innerText = "إنهاء الجولة";
+            }
+        }
+
+        function goPrev() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadQuestion();
+            }
+        }
+
+        function goNext() {
+            if (currentIndex < currentRoundQuestions.length - 1) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                evaluateRoundEnd();
+            }
+        }
+
+        function evaluateRoundEnd() {
+            let failedQuestions = currentRoundQuestions.filter(q => q.userAnswerIndex !== q.correct);
+            if (failedQuestions.length > 0) {
+                currentRound++;
+                let cleanFailed = failedQuestions.map(q => ({ q: q.q, opts: q.opts, correct: q.correct, section: q.section }));
+                prepareRound(cleanFailed);
+                loadQuestion();
+            } else {
+                document.getElementById('win-overlay').style.display = 'flex';
+                confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 }, colors: ['#4CAF50', '#8BC34A', '#FFC107', '#E91E63'] });
+            }
+        }
+    </script>
+</body>
+</html>
